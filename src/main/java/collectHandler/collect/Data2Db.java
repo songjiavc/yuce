@@ -91,7 +91,7 @@ public class Data2Db {
 			if(!haveDataInIssueId(srcDataBean.getIssueId(),conn)){
 				insertData(srcDataBean,conn);
 			}
-			batchUpdateMiss();
+			batchUpdateMiss(srcDataBean,conn);
 		}catch (SQLException e) {
 			flag = false;
 		}finally{
@@ -178,7 +178,7 @@ public class Data2Db {
 			  stmt.addBatch(AnalysisMissUtil.getTwoSameGroupMiss(srcDataBean));
 			  //同时提交所有的sql语句
 			  stmt.addBatch("UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = CURRENT_MISS+1 WHERE CURRENT_MISS <> 0;");
-			  stmt.addBatch("UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = CURRENT_MISS+1 WHERE CURRENT_MISS <> 0;");
+			  stmt.addBatch("UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET MAX_MISS = CURRENT_MISS WHERE CURRENT_MISS > MAX_MISS;");
 			  stmt.executeBatch();
 			  
 			  //提交修改
