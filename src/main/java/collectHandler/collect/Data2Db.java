@@ -1,6 +1,7 @@
 package collectHandler.collect;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -90,6 +91,7 @@ public class Data2Db {
 			if(!haveDataInIssueId(srcDataBean.getIssueId(),conn)){
 				insertData(srcDataBean,conn);
 			}
+			batchUpdateMiss();
 		}catch (SQLException e) {
 			flag = false;
 		}finally{
@@ -150,5 +152,46 @@ public class Data2Db {
 		}
 		return flag;
 	}
+	
+	/** 
+	  * @Description: 更新遗漏值
+	  * @author songj@sdfcp.com
+	 * @throws SQLException 
+	  * @date Feb 17, 2016 11:21:29 AM  
+	  */
+	private void batchUpdateMiss(SrcDataBean srcDataBean,Connection conn) throws SQLException{
+		DatabaseMetaData dbmd= conn.getMetaData();
+		boolean a = dbmd.supportsBatchUpdates();
+		if(a){
+			try
+			 {
+			  //保存当前自动提交模式
+			  boolean booleanautoCommit = conn.getAutoCommit();
+			  //关闭自动提交
+			  conn.setAutoCommit(false);
+			  PreparedStatement stmt = (PreparedStatement) conn.prepareStatement(AnalysisMissUtil.getAllGroupMiss(srcDataBean));
+			  //使用Statement同时收集多条sql语句
+			  stmt.addBatch(AnalysisMissUtil.getAllNumMiss(srcDataBean));
+			  stmt.addBatch(AnalysisMissUtil.getFourNumGroupMiss(srcDataBean));
+			  stmt.addBatch(AnalysisMissUtil.getOddOrEvenMiss(srcDataBean));
+			  stmt.addBatch(AnalysisMissUtil.getSmallOrBigMiss(srcDataBean));
+			  stmt.addBatch(AnalysisMissUtil.getTwoSameGroupMiss(srcDataBean));
+			  //同时提交所有的sql语句
+			  stmt.addBatch("UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = CURRENT_MISS+1 WHERE CURRENT_MISS <> 0;");
+			  stmt.addBatch("UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = CURRENT_MISS+1 WHERE CURRENT_MISS <> 0;");
+			  stmt.executeBatch();
+			  
+			  //提交修改
+			  conn.commit();
+			  conn.setAutoCommit(booleanautoCommit);
+			 }
+			 catch(Exception e)
+			 {
+			    e.printStackTrace();
+			    conn.rollback(); 
+			 }
+		}
+	}
+	
 
 }
