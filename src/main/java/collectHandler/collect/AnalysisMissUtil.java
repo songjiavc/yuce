@@ -1,9 +1,5 @@
 package collectHandler.collect;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 
 
@@ -41,8 +37,8 @@ public class AnalysisMissUtil {
 	public static String getAllGroupMiss(SrcDataBean srcDataBean){
 		String rtnSql = null;
 		int[] noArr = getIntArr(srcDataBean);
-		String inStr = ArrToStr(noArr);
-		rtnSql = "UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = 0 WHERE TYPE IN (6,7) GROUP_NUMBER IN ("+inStr+")";
+		String inStr = getGroupByNumber(noArr);
+		rtnSql = "UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = 0 WHERE TYPE IN (6,7) AND GROUP_NUMBER IN ("+inStr+")";
 		return rtnSql;
 	}
 	
@@ -60,8 +56,8 @@ public class AnalysisMissUtil {
 		int status = getNumberForm(srcDataBean);
 		if(status == 2){
 			int[] noArr = getIntArr(srcDataBean);
-			String inStr = ArrToStr(noArr);
-			rtnSql = "UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = 0 WHERE TYPE = 8 GROUP_NUMBER IN ("+inStr+")";
+			String inStr = getGroupByNumber(noArr);
+			rtnSql = "UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = 0 WHERE TYPE = 8 AND GROUP_NUMBER IN ("+inStr+")";
 		}
 		return rtnSql;
 	}
@@ -78,7 +74,7 @@ public class AnalysisMissUtil {
 		int[] noArr = new int[]{srcDataBean.getNo1(),srcDataBean.getNo2(),srcDataBean.getNo3()};
 		Arrays.sort(noArr);
 		int group = noArr[0]*100+noArr[1]*10+noArr[2];
-		rtnSql = "UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = 0 WHERE TYPE = 5 GROUP_NUMBER LIKE '%"+group+"%')";
+		rtnSql = "UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = 0 WHERE TYPE = 5 AND GROUP_NUMBER LIKE '%"+group+"%'";
 		return rtnSql;
 	}
 	
@@ -164,11 +160,26 @@ public class AnalysisMissUtil {
 		StringBuffer rtnStr = new StringBuffer();
 		if(arr!=null && arr.length>0){
 			for(int i = 0;i < arr.length; i++){
-				rtnStr.append(arr[i]).append(",");
+				rtnStr.append(arr[i]);
 			}
-			return rtnStr.substring(0, rtnStr.length()-1).toString();
+			return rtnStr.toString();
 		}
 		return null;
+	}
+	
+	/** 
+	  * @Description: 根据开奖号码获取组合
+	  * @author songj@sdfcp.com
+	  * @date Feb 19, 2016 3:06:57 PM 
+	  * @param arr
+	  * @return 
+	  */
+	public static String getGroupByNumber(int[] arr){
+		StringBuffer rtnStr = new StringBuffer();
+		if(arr.length > 0){
+			rtnStr.append(arr[0]*10+arr[1]).append(",").append(arr[0]*10+arr[2]).append(",").append(arr[1]*10+arr[2]);
+		}
+		return rtnStr.toString();
 	}
 	
 	/** 
@@ -192,21 +203,6 @@ public class AnalysisMissUtil {
 	
 	public static void main(String[] args){
 		int[][] noArr1 = new int[][]{{1,1,1},{6,6,6},{3,3,3},{4,4,4},{5,3,6},{3,3,6}};
-		for(int i = 0;i < noArr1.length;i++){
-			Arrays.sort(noArr1[i]);
-			if(noArr1[i][2] < 4){
-				//全小
-				System.out.println("全小");
-			}else if(noArr1[i][0] > 3){
-				//全大
-				System.out.println("全大");
-			}else if(noArr1[i][1] > 3){
-				//两大一小
-				System.out.println("两大一小");
-			}else{
-				//两小一大
-				System.out.println("两小一大");
-			}
-		}
+		//getNumberForm
 	}
 }

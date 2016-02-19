@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.mysql.jdbc.PreparedStatement;
 
@@ -51,11 +53,43 @@ public class Data2Db {
 	  * @param issueId
 	  * @return 
 	  */
+	public List<SrcDataBean> getAllRecord(){
+		Connection srcConn = ConnectSrcDb.getSrcConnection();
+		List<SrcDataBean> srcList = new ArrayList<SrcDataBean>();
+		PreparedStatement pstmt = null;
+		String sql = "SELECT issue_id,no_1,no_2,no_3 FROM echart3.echart_anhui_kuai3_t";
+		try {
+			pstmt = (PreparedStatement) srcConn.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()){
+				SrcDataBean srcDataBean = new SrcDataBean();
+				srcDataBean.setIssueId(rs.getString(1));
+				srcDataBean.setNo1(rs.getInt(2));
+				srcDataBean.setNo2(rs.getInt(3));
+				srcDataBean.setNo3(rs.getInt(4));
+				srcList.add(srcDataBean);
+			}
+			if(rs != null && !rs.isClosed()){
+				rs.close();
+			}
+		} catch (SQLException e) {
+			LogUtil.error(e.getMessage());
+		}
+		return srcList;
+	}
+	
+	/** 
+	  * @Description: 根据期号在源数据库中获取记录
+	  * @author songj@sdfcp.com
+	  * @date Feb 15, 2016 4:24:40 PM 
+	  * @param issueId
+	  * @return 
+	  */
 	public SrcDataBean getRecordByIssueId(String issueId){
 		Connection srcConn = ConnectSrcDb.getSrcConnection();
 		SrcDataBean srcDataBean = new SrcDataBean();
 		PreparedStatement pstmt = null;
-		String sql = "SELECT issue_id,no_1,no_2,no_3 FROM echart3.echart_anhui_kuai3_t";
+		String sql = "SELECT issue_id,no_1,no_2,no_3 FROM echart3.echart_anhui_kuai3_t WHERE issue_id = '"+issueId+"'";
 		try {
 			pstmt = (PreparedStatement) srcConn.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
@@ -118,8 +152,9 @@ public class Data2Db {
 	  * @throws SQLException 
 	  */
 	private void insertData(SrcDataBean srcDataBean,Connection conn) throws SQLException{
-		String sql = "insert into T_ANHUI_KUAI3_NUMBER (issue_number,no1,no2,no3，create_time,origin) values(?,?,?,?,?,?)";
+		String sql = "insert into T_ANHUI_KUAI3_NUMBER (issue_number,no1,no2,no3,create_time,origin) values(?,?,?,?,?,?)";
 		PreparedStatement pstmt = (PreparedStatement) conn.prepareStatement(sql);
+		
 		pstmt.setString(1, srcDataBean.getIssueId());
 		pstmt.setInt(2, srcDataBean.getNo1());
 		pstmt.setInt(3, srcDataBean.getNo2());
@@ -141,7 +176,7 @@ public class Data2Db {
 	private boolean haveDataInIssueId(String issueId,Connection conn) throws SQLException{
 		boolean flag = false;
 		int count = 0;
-		String sql = "SELECT COUNT(*) FROM T_ANHUI_KUAI3_NUMBER WHERE issue_id = '"+issueId+"'";
+		String sql = "SELECT COUNT(*) FROM T_ANHUI_KUAI3_NUMBER WHERE ISSUE_NUMBER = '"+issueId+"'";
 		PreparedStatement pstmt = (PreparedStatement) conn.prepareStatement(sql);
 		ResultSet rs = pstmt.executeQuery();
 		while(rs.next()){
@@ -171,14 +206,14 @@ public class Data2Db {
 			  conn.setAutoCommit(false);
 			  PreparedStatement stmt = (PreparedStatement) conn.prepareStatement(AnalysisMissUtil.getAllGroupMiss(srcDataBean));
 			  //使用Statement同时收集多条sql语句
+			  stmt.addBatch("UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET ISSUE_NUMBER = "+srcDataBean.getIssueId()+",CURRENT_MISS = CURRENT_MISS+1;");
 			  stmt.addBatch(AnalysisMissUtil.getAllNumMiss(srcDataBean));
 			  stmt.addBatch(AnalysisMissUtil.getFourNumGroupMiss(srcDataBean));
 			  stmt.addBatch(AnalysisMissUtil.getOddOrEvenMiss(srcDataBean));
 			  stmt.addBatch(AnalysisMissUtil.getSmallOrBigMiss(srcDataBean));
 			  stmt.addBatch(AnalysisMissUtil.getTwoSameGroupMiss(srcDataBean));
 			  //同时提交所有的sql语句
-			  stmt.addBatch("UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET CURRENT_MISS = CURRENT_MISS+1 WHERE CURRENT_MISS <> 0;");
-			  stmt.addBatch("UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET MAX_MISS = CURRENT_MISS WHERE CURRENT_MISS > MAX_MISS;");
+			  stmt.addBatch("UPDATE T_ANHUI_KUAI3_MISSANALYSIS SET MAX_MISS = CURRENT_MISS WHERE CURRENT_MISS > MAX_MISS AND CURRENT_MISS <> 0;");
 			  stmt.executeBatch();
 			  
 			  //提交修改

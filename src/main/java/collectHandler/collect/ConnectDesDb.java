@@ -25,15 +25,15 @@ public class ConnectDesDb{
     	try{ 
          	String driver = "com.mysql.jdbc.Driver";
 			String url = "jdbc:mysql://192.168.1.253:3306/echart3";
-			String username = "echart";
-			String password = "echart";
+			String username = "";
+			String password = "";
             Properties p = new Properties();
             InputStream is = ConnectSrcDb.class.getClassLoader().getResourceAsStream("db.properties");
             p.load(is);
             driver = p.getProperty("driver",driver); 
             url = p.getProperty("des.url",url); 
             username = p.getProperty("des.username",username); 
-            password = p.getProperty("des.Password",password);
+            password = p.getProperty("des.password",password);
             Properties pr = new Properties(); 
             pr.put("user",username); 
             pr.put("password",password); 
