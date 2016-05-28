@@ -44,7 +44,7 @@ public class App {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        lineCount  = p.getProperty("lineCount","80"); 
+        lineCount  = p.getProperty("lineCount","79"); 
         srcNumberTbName = p.getProperty("srcNumberTbName");
         danMaTbName = p.getProperty("danMaTbName");
         simaTbName = p.getProperty("simaTbName");
@@ -114,7 +114,7 @@ public class App {
 			   return issueNumber.substring(0,issueNumber.length()-2)+nextIssue;
 		   }else{
 			   if(nextIssue == 0){
-				  return issueNumber.substring(0,issueNumber.length()-2)+"80";
+				  return issueNumber.substring(0,issueNumber.length()-2)+App.lineCount;
 			   }else if(nextIssue == 1 ){
 				   return DateUtil.getNextDay() + "001";
 			   }else{

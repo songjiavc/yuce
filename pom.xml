@@ -57,5 +57,5 @@
 	  <version>1.8.2</version>
     </dependency>
 </dependencies>
-	<artifactId>AhFast3DanSimaSame</artifactId>
+	<artifactId>JlFast3DanSimaSame</artifactId>
 </project>

@@ -81,7 +81,7 @@ public class Data2DbSameNumber {  //02478815484      6228480128008022377   ä½•æ¹
 				rs.close();
 			}
 		}catch (SQLException e) {
-			LogUtil.error(e.getMessage(),"sima");
+			LogUtil.error(e.getMessage(),"same/");
 		}
 		return srcDataBean;
 	}
@@ -113,7 +113,7 @@ public class Data2DbSameNumber {  //02478815484      6228480128008022377   ä½•æ¹
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			LogUtil.error(e.getMessage(),"sima/");
+			LogUtil.error(e.getMessage(),"same/");
 		}
 		return srcList;
 	}
@@ -145,7 +145,7 @@ public class Data2DbSameNumber {  //02478815484      6228480128008022377   ä½•æ¹
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			LogUtil.error(e.getMessage(),"sima/");
+			LogUtil.error(e.getMessage(),"same/");
 		}
 		return srcList;
 	}

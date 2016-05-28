@@ -79,7 +79,7 @@ public class DateUtil {
 			int next = (Integer.parseInt(issueCode)+1) % Integer.parseInt(App.lineCount);
 			if(next < 10){
 				if(next == 0){
-					nextIssueCode = "80";
+					nextIssueCode = App.lineCount;
 				}else{
 					nextIssueCode = "0" + next;
 				}
