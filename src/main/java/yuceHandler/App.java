@@ -77,9 +77,9 @@ public class App {
 		String maxIssueNumber = data2Db.findMaxIssueIdFromSrcDb();
 		if(!maxIssueId.equals(maxIssueNumber)){
 			maxIssueId = maxIssueNumber;
-			startDanMa(maxIssueId);                //胆码计算放发组开始
+			//startDanMa(maxIssueId);                //胆码计算放发组开始
 			// 四码复式计算组  
-			startSiMa(maxIssueId);
+			//startSiMa(maxIssueId);
 			//同码预测
 	   		startSameNumber(maxIssueId);
 		}
@@ -149,6 +149,8 @@ public class App {
 	   }catch(SQLException sqlEx){
 		   sqlEx.printStackTrace();
 		   LogUtil.error(issueNumber+"预测失败！",App.province+"/same");
+	   }catch(Exception e){
+		   e.printStackTrace();
 	   }
 	   }
    

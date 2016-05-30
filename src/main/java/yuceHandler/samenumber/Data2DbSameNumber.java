@@ -97,7 +97,7 @@ public class Data2DbSameNumber {  //02478815484      6228480128008022377   何�
 		List<String> srcList = new ArrayList<String>();
 		PreparedStatement pstmt = null;
 		//获取相同号码下一期期号列表期号列表
-		String getIssueList = "SELECT ISSUE_NUMBER FROM T_ANHUI_KUAI3_NUMBER WHERE no1=? and no2=? and no3=? ORDER BY ISSUE_NUMBER DESC LIMIT 10 ";
+		String getIssueList = "SELECT ISSUE_NUMBER FROM " + App.srcNumberTbName + " WHERE no1=? and no2=? and no3=? ORDER BY ISSUE_NUMBER DESC LIMIT 10 ";
 		try {
 			pstmt = (PreparedStatement) srcConn.prepareStatement(getIssueList);
 			pstmt.setInt(1,srcDataBean.getNo1());
@@ -128,7 +128,7 @@ public class Data2DbSameNumber {  //02478815484      6228480128008022377   何�
 		Connection srcConn = ConnectSrcDb.getSrcConnection();
 		PreparedStatement pstmt = null;
 		//获取相同号码下一期期号列表期号列表
-		String getIssueList = "SELECT ISSUE_NUMBER,NO1,NO2,NO3 FROM T_ANHUI_KUAI3_NUMBER WHERE issue_number IN ("+DateUtil.listToString(nextIssue)+") ORDER BY ISSUE_NUMBER DESC";
+		String getIssueList = "SELECT ISSUE_NUMBER,NO1,NO2,NO3 FROM  " + App.srcNumberTbName + " WHERE issue_number IN ("+DateUtil.listToString(nextIssue)+") ORDER BY ISSUE_NUMBER DESC";
 		try {
 			pstmt = (PreparedStatement) srcConn.prepareStatement(getIssueList);
 			ResultSet rs = pstmt.executeQuery();
@@ -212,9 +212,10 @@ public class Data2DbSameNumber {  //02478815484      6228480128008022377   何�
 	    	param.setIssueId(nextIssueList.get(0));
 	    	noList.add(0,param);
 	    	//插入新纪录时需要判断
-	    	insertData2Db(issueList,noList,fast3CountList); 
+	    	if(issueList.size() == 10){
+	    		insertData2Db(issueList,noList,fast3CountList); 
+	    	}
 		}
-    	
     }
     
     /**
